@@ -172,7 +172,7 @@ namespace ExtendedColorSchemes
 
         // Makes sure the color scheme exist, probably a bit overkill,
         // but at least not messing up the game's save file
-        if (existsInCollection && !____colorSchemesDict.ContainsKey(value))
+        if (!existsInCollection && !____colorSchemesDict.ContainsKey(value))
           return false;
 
         // Prevents the game from overriding our selected color scheme at launch time
