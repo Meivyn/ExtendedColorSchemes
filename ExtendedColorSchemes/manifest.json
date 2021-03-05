@@ -3,7 +3,7 @@
   "id": "ExtendedColorSchemes",
   "name": "ExtendedColorSchemes",
   "author": "Meivyn",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Adds additional custom slots to color schemes.",
   "gameVersion": "1.13.2",
   "dependsOn": {
