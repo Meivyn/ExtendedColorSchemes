@@ -1,4 +1,8 @@
 ﻿# Changelog
+
+## v1.0.2
+
+- Updated for patch 1.13.4
  
 ## v1.0.1
 

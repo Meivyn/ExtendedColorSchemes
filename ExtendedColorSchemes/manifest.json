@@ -3,9 +3,9 @@
   "id": "ExtendedColorSchemes",
   "name": "ExtendedColorSchemes",
   "author": "Meivyn",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Adds additional custom slots to color schemes.",
-  "gameVersion": "1.13.2",
+  "gameVersion": "1.13.4",
   "dependsOn": {
     "BSIPA": "^4.1.4"
   }
