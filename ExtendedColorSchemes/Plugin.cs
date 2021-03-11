@@ -7,33 +7,33 @@ using IPALogger = IPA.Logging.Logger;
 
 namespace ExtendedColorSchemes
 {
-  [Plugin(RuntimeOptions.SingleStartInit)]
-  public class Plugin
-  {
-    internal static IPALogger Log { get; private set; }
-    internal static Config Config { get; private set; }
-
-    private readonly Harmony _harmony;
-    private const string HarmonyID = "com.meivyn.extendedcolorschemes";
-
-    [Init]
-    public Plugin(IPALogger logger, Conf conf)
+    [Plugin(RuntimeOptions.SingleStartInit)]
+    public class Plugin
     {
-      Log = logger;
-      Config = conf.Generated<Config>();
-      _harmony = new Harmony(HarmonyID);
-    }
+        internal static IPALogger Log { get; private set; }
+        internal static Config Config { get; private set; }
 
-    [OnStart]
-    public void OnApplicationStart()
-    {
-      _harmony.PatchAll(Assembly.GetExecutingAssembly());
-    }
+        private readonly Harmony _harmony;
+        private const string HarmonyID = "com.meivyn.extendedcolorschemes";
 
-    [OnExit]
-    public void OnApplicationQuit()
-    {
+        [Init]
+        public Plugin(IPALogger logger, Conf conf)
+        {
+            Log = logger;
+            Config = conf.Generated<Config>();
+            _harmony = new Harmony(HarmonyID);
+        }
 
+        [OnStart]
+        public void OnApplicationStart()
+        {
+            _harmony.PatchAll(Assembly.GetExecutingAssembly());
+        }
+
+        [OnExit]
+        public void OnApplicationQuit()
+        {
+
+        }
     }
-  }
 }

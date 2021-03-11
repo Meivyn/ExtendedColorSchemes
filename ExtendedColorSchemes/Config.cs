@@ -8,13 +8,13 @@ using System.Runtime.CompilerServices;
 
 namespace ExtendedColorSchemes
 {
-  internal class Config
-  {
-    public virtual string SelectedColorSchemeId { get; set; }
+    internal class Config
+    {
+        public virtual string SelectedColorSchemeId { get; set; }
 
-    [UseConverter(typeof(ListConverter<Utilities.ExtendedColorScheme>))]
-    public virtual List<Utilities.ExtendedColorScheme> ColorSchemesList { get; set; } = new List<Utilities.ExtendedColorScheme>();
+        [UseConverter(typeof(ListConverter<Utilities.ExtendedColorScheme>))]
+        public virtual List<Utilities.ExtendedColorScheme> ColorSchemesList { get; set; } = new List<Utilities.ExtendedColorScheme>();
 
-    public virtual void Changed() { }
-  }
+        public virtual void Changed() { }
+    }
 }
