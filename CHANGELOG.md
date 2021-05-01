@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.4
+
+- Fixed schemes renamed to "Default" instead of the localized name if there was an existing config
+
 ## v1.0.3
  
 - Updated for patch 1.15.0

@@ -8,7 +8,7 @@ namespace ExtendedColorSchemes
         // Wrapper class so that BSIPA can save the color schemes
         internal class ExtendedColorScheme
         {
-            public string _colorSchemeId = "Default";
+            internal string _colorSchemeId = "Default";
             internal string _colorSchemeNameLocalizationKey = "Default";
             internal bool _isEditable = true;
             internal Color _saberAColor = Color.white;

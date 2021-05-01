@@ -12,31 +12,41 @@ namespace ExtendedColorSchemes.HarmonyPatches
             internal static void Postfix(List<ColorScheme> ____colorSchemesList, string ____selectedColorSchemeId)
             {
                 if (Plugin.Config.SelectedColorSchemeId == null)
-                {
                     Plugin.Config.SelectedColorSchemeId = ____selectedColorSchemeId;
 
-                    if (Plugin.Config.ColorSchemesList.Count == 0)
-                    {
-                        for (int i = 0; i < 16; i++)
-                        {
-                            Plugin.Config.ColorSchemesList.Add(new Utils.ExtendedColorScheme
-                            {
-                                _colorSchemeId = $"User{i + 4}",
-                                _colorSchemeNameLocalizationKey = $"CUSTOM_{i + 4}_COLOR_SCHEME",
-                                _isEditable = ____colorSchemesList[0].isEditable,
-                                _saberAColor = ____colorSchemesList[0].saberAColor,
-                                _saberBColor = ____colorSchemesList[0].saberBColor,
-                                _environmentColor0 = ____colorSchemesList[0].environmentColor0,
-                                _environmentColor1 = ____colorSchemesList[0].environmentColor1,
-                                _supportsEnvironmentColorBoost = ____colorSchemesList[0].supportsEnvironmentColorBoost,
-                                _environmentColor0Boost = ____colorSchemesList[0].environmentColor0Boost,
-                                _environmentColor1Boost = ____colorSchemesList[0].environmentColor1Boost,
-                                _obstaclesColor = ____colorSchemesList[0].obstaclesColor,
-                            });
-                        }
+                var isOutdated = Plugin.Config.ColorSchemesList.Any(x => x._colorSchemeNameLocalizationKey == "Default");
 
-                        Plugin.Config.Changed();
+                if (Plugin.Config.ColorSchemesList.Count == 0 || isOutdated)
+                {
+                    for (int i = 0; i < 16; i++)
+                    {
+                        Utils.ExtendedColorScheme oldColorScheme = null;
+
+                        if (Plugin.Config.ColorSchemesList.Count > i)
+                            oldColorScheme = Plugin.Config.ColorSchemesList[i];
+
+                        var newColorScheme = new Utils.ExtendedColorScheme
+                        {
+                            _colorSchemeId = $"User{i + 4}",
+                            _colorSchemeNameLocalizationKey = $"CUSTOM_{i + 4}_COLOR_SCHEME",
+                            _isEditable = oldColorScheme != null ? oldColorScheme._isEditable : ____colorSchemesList[0].isEditable,
+                            _saberAColor = oldColorScheme != null ? oldColorScheme._saberAColor : ____colorSchemesList[0].saberAColor,
+                            _saberBColor = oldColorScheme != null ? oldColorScheme._saberBColor : ____colorSchemesList[0].saberBColor,
+                            _environmentColor0 = oldColorScheme != null ? oldColorScheme._environmentColor0 : ____colorSchemesList[0].environmentColor0,
+                            _environmentColor1 = oldColorScheme != null ? oldColorScheme._environmentColor1 : ____colorSchemesList[0].environmentColor1,
+                            _supportsEnvironmentColorBoost = oldColorScheme != null ? oldColorScheme._supportsEnvironmentColorBoost : ____colorSchemesList[0].supportsEnvironmentColorBoost,
+                            _environmentColor0Boost = oldColorScheme != null ? oldColorScheme._environmentColor0Boost : ____colorSchemesList[0].environmentColor0Boost,
+                            _environmentColor1Boost = oldColorScheme != null ? oldColorScheme._environmentColor1Boost : ____colorSchemesList[0].environmentColor1Boost,
+                            _obstaclesColor = oldColorScheme != null ? oldColorScheme._obstaclesColor : ____colorSchemesList[0].obstaclesColor,
+                        };
+
+                        if (oldColorScheme != null)
+                            Plugin.Config.ColorSchemesList.Remove(oldColorScheme);
+
+                        Plugin.Config.ColorSchemesList.Insert(i, newColorScheme);
                     }
+
+                    Plugin.Config.Changed();
                 }
             }
         }
