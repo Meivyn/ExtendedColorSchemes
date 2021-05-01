@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ExtendedColorSchemes
 {
-    internal class Utilities
+    internal class Utils
     {
         // Wrapper class so that BSIPA can save the color schemes
         internal class ExtendedColorScheme
@@ -19,8 +19,6 @@ namespace ExtendedColorSchemes
             internal Color _environmentColor0Boost = Color.white;
             internal Color _environmentColor1Boost = Color.white;
             internal Color _obstaclesColor = Color.white;
-
-            public ExtendedColorScheme() { }
 
             public ColorScheme ToColorScheme()
             {

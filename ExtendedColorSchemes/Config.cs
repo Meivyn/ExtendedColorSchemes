@@ -12,8 +12,8 @@ namespace ExtendedColorSchemes
     {
         public virtual string SelectedColorSchemeId { get; set; }
 
-        [UseConverter(typeof(ListConverter<Utilities.ExtendedColorScheme>))]
-        public virtual List<Utilities.ExtendedColorScheme> ColorSchemesList { get; set; } = new List<Utilities.ExtendedColorScheme>();
+        [UseConverter(typeof(ListConverter<Utils.ExtendedColorScheme>))]
+        public virtual List<Utils.ExtendedColorScheme> ColorSchemesList { get; set; } = new List<Utils.ExtendedColorScheme>();
 
         public virtual void Changed() { }
     }

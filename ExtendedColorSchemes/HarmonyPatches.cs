@@ -19,7 +19,7 @@ namespace ExtendedColorSchemes
                     {
                         for (int i = 0; i < 16; i++)
                         {
-                            Plugin.Config.ColorSchemesList.Add(new Utilities.ExtendedColorScheme
+                            Plugin.Config.ColorSchemesList.Add(new Utils.ExtendedColorScheme
                             {
                                 _colorSchemeId = $"User{i + 4}",
                                 _colorSchemeName = $"Custom {i + 4}",
@@ -47,7 +47,7 @@ namespace ExtendedColorSchemes
             internal static void Postfix(ref int __result)
             {
                 // Prevents the game from saving our color schemes
-                if (Utilities.IsCallByMethod("Save"))
+                if (Utils.IsCallByMethod("Save"))
                     return;
 
                 __result += Plugin.Config.ColorSchemesList.Count;
@@ -61,7 +61,7 @@ namespace ExtendedColorSchemes
             {
                 // Prevents the game from saving our color schemes,
                 // we should only save the base color schemes
-                if (Utilities.IsCallByMethod("Save"))
+                if (Utils.IsCallByMethod("Save"))
                     return true;
 
                 // Makes sure our color schemes are inserted at the fourth position
@@ -142,7 +142,7 @@ namespace ExtendedColorSchemes
                     {
                         if (Plugin.Config.ColorSchemesList[i]._colorSchemeId == colorScheme.colorSchemeId)
                         {
-                            Plugin.Config.ColorSchemesList[i] = Utilities.ToExtendedColorScheme(colorScheme);
+                            Plugin.Config.ColorSchemesList[i] = Utils.ToExtendedColorScheme(colorScheme);
                             return;
                         }
                     }
@@ -156,7 +156,7 @@ namespace ExtendedColorSchemes
             internal static void Postfix(ref string __result)
             {
                 // Prevents the game from saving our color schemes selection
-                if (Utilities.IsCallByMethod("Save"))
+                if (Utils.IsCallByMethod("Save"))
                     return;
 
                 __result = Plugin.Config.SelectedColorSchemeId;
@@ -176,7 +176,7 @@ namespace ExtendedColorSchemes
                     return false;
 
                 // Prevents the game from overriding our selected color scheme at launch time
-                if (Utilities.IsCallByMethod("LoadFromCurrentVersion"))
+                if (Utils.IsCallByMethod("LoadFromCurrentVersion"))
                     return true;
 
                 Plugin.Config.SelectedColorSchemeId = value;
