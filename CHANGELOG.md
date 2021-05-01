@@ -1,4 +1,10 @@
-﻿# Changelog
+# Changelog
+
+## v1.0.3
+ 
+- Updated for patch 1.15.0
+- Default schemes names are now localized
+- Requires SiraUtil
 
 ## v1.0.2
 
