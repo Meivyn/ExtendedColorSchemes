@@ -1,6 +1,6 @@
-# Extended Color Schemes
+# ExtendedColorSchemes
 
-Extended Color Schemes is a Beat Saber mod that allows the user to have many more customizable color schemes than is currently available in the game. There are 16 more schemes added by default, but you can add (or delete some) by carefully editing the configuration file here: `Beat Saber\UserData\ExtendedColorSchemes.json`
+ExtendedColorSchemes is a Beat Saber mod that allows the user to have many more customizable color schemes than is currently available in the game. There are 16 more schemes added by default, but you can add (or delete some) by carefully editing the configuration file here: `Beat Saber\UserData\ExtendedColorSchemes.json`
 
 ## Acknowledgements
 
