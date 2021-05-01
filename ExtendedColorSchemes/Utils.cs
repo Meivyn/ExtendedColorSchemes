@@ -9,7 +9,7 @@ namespace ExtendedColorSchemes
         internal class ExtendedColorScheme
         {
             public string _colorSchemeId = "Default";
-            internal string _colorSchemeName = "Default";
+            internal string _colorSchemeNameLocalizationKey = "Default";
             internal bool _isEditable = true;
             internal Color _saberAColor = Color.white;
             internal Color _saberBColor = Color.white;
@@ -24,7 +24,7 @@ namespace ExtendedColorSchemes
             {
                 return new ColorScheme(
                     _colorSchemeId,
-                    _colorSchemeName,
+                    _colorSchemeNameLocalizationKey,
                     _isEditable,
                     _saberAColor,
                     _saberBColor,
@@ -43,7 +43,7 @@ namespace ExtendedColorSchemes
             var extendedColorScheme = new ExtendedColorScheme
             {
                 _colorSchemeId = colorScheme.colorSchemeId,
-                _colorSchemeName = colorScheme.colorSchemeName,
+                _colorSchemeNameLocalizationKey = colorScheme.colorSchemeNameLocalizationKey,
                 _isEditable = colorScheme.isEditable,
                 _saberAColor = colorScheme.saberAColor,
                 _saberBColor = colorScheme.saberBColor,

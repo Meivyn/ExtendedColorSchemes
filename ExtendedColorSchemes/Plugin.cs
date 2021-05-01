@@ -1,6 +1,8 @@
-﻿using HarmonyLib;
+﻿using ExtendedColorSchemes.Installers;
+using HarmonyLib;
 using IPA;
 using IPA.Config.Stores;
+using SiraUtil.Zenject;
 using System.Reflection;
 using Conf = IPA.Config.Config;
 using IPALogger = IPA.Logging.Logger;
@@ -17,11 +19,13 @@ namespace ExtendedColorSchemes
         private const string HarmonyID = "com.meivyn.extendedcolorschemes";
 
         [Init]
-        public Plugin(IPALogger logger, Conf conf)
+        public Plugin(IPALogger logger, Conf conf, Zenjector zenjector)
         {
             Log = logger;
             Config = conf.Generated<Config>();
             _harmony = new Harmony(HarmonyID);
+
+            zenjector.OnApp<LocalizerInstaller>();
         }
 
         [OnStart]
