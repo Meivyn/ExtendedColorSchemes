@@ -10,12 +10,14 @@ namespace ExtendedColorSchemes
         {
             internal string _colorSchemeId = "Default";
             internal string _colorSchemeNameLocalizationKey = "Default";
+            internal string _nonLocalizedName = "Default";
             internal bool _isEditable = true;
+            internal bool _useNonLocalizedName = false;
             internal Color _saberAColor = Color.white;
             internal Color _saberBColor = Color.white;
             internal Color _environmentColor0 = Color.white;
             internal Color _environmentColor1 = Color.white;
-            internal bool _supportsEnvironmentColorBoost = false;
+            internal bool _supportsEnvironmentColorBoost;
             internal Color _environmentColor0Boost = Color.white;
             internal Color _environmentColor1Boost = Color.white;
             internal Color _obstaclesColor = Color.white;
@@ -25,6 +27,8 @@ namespace ExtendedColorSchemes
                 return new ColorScheme(
                     _colorSchemeId,
                     _colorSchemeNameLocalizationKey,
+                    _useNonLocalizedName,
+                    _nonLocalizedName,
                     _isEditable,
                     _saberAColor,
                     _saberBColor,
