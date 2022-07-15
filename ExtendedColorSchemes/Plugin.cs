@@ -25,7 +25,7 @@ namespace ExtendedColorSchemes
             Config = conf.Generated<Config>();
             _harmony = new Harmony(HarmonyID);
 
-            zenjector.OnApp<LocalizerInstaller>();
+            zenjector.Install<LocalizerInstaller>(Location.App);
         }
 
         [OnStart]
@@ -37,7 +37,7 @@ namespace ExtendedColorSchemes
         [OnExit]
         public void OnApplicationQuit()
         {
-
+            _harmony.UnpatchSelf();
         }
     }
 }
