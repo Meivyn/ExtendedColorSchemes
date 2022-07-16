@@ -3,11 +3,11 @@
   "id": "ExtendedColorSchemes",
   "name": "ExtendedColorSchemes",
   "author": "Meivyn",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Adds additional custom slots to color schemes.",
-  "gameVersion": "1.15.0",
+  "gameVersion": "1.24.0",
   "dependsOn": {
-    "BSIPA": "^4.1.4",
-    "SiraUtil":  "^2.5.3"
+    "BSIPA": "^4.2.2",
+    "SiraUtil":  "^3.1.0"
   }
 }

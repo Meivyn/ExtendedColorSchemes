@@ -1,11 +1,15 @@
 ﻿using HarmonyLib;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 
 namespace ExtendedColorSchemes.HarmonyPatches
 {
     internal class HarmonyPatches
     {
+        internal static bool IsSaving;
+        internal static bool IsLoading;
+        
         [HarmonyPatch(typeof(ColorSchemesSettings), MethodType.Constructor, new[] { typeof(ColorScheme[]) })]
         private class PColorSchemesSettings
         {
@@ -57,7 +61,7 @@ namespace ExtendedColorSchemes.HarmonyPatches
             internal static void Postfix(ref int __result)
             {
                 // Prevents the game from saving our color schemes
-                if (Utils.IsCallByMethod("Save"))
+                if (IsSaving)
                     return;
 
                 __result += Plugin.Config.ColorSchemesList.Count;
@@ -71,7 +75,7 @@ namespace ExtendedColorSchemes.HarmonyPatches
             {
                 // Prevents the game from saving our color schemes,
                 // we should only save the base color schemes
-                if (Utils.IsCallByMethod("Save"))
+                if (IsSaving)
                     return true;
 
                 // Makes sure our color schemes are inserted at the fourth position
@@ -166,7 +170,7 @@ namespace ExtendedColorSchemes.HarmonyPatches
             internal static void Postfix(ref string __result)
             {
                 // Prevents the game from saving our color schemes selection
-                if (Utils.IsCallByMethod("Save"))
+                if (IsSaving)
                     return;
 
                 __result = Plugin.Config.SelectedColorSchemeId;
@@ -186,7 +190,7 @@ namespace ExtendedColorSchemes.HarmonyPatches
                     return false;
 
                 // Prevents the game from overriding our selected color scheme at launch time
-                if (Utils.IsCallByMethod("LoadFromCurrentVersion"))
+                if (IsLoading)
                     return true;
 
                 Plugin.Config.SelectedColorSchemeId = value;
@@ -195,6 +199,54 @@ namespace ExtendedColorSchemes.HarmonyPatches
                     return false;
 
                 return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(PlayerDataFileManagerSO), nameof(PlayerDataFileManagerSO.Save))]
+        private class PSavePlayerData
+        {
+            internal static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+            {
+                var res = instructions.ToList();
+                var field = AccessTools.Field(typeof(HarmonyPatches), nameof(IsSaving));
+                
+                res.InsertRange(0, new []
+                {
+                    new CodeInstruction(OpCodes.Ldc_I4_1),
+                    new CodeInstruction(OpCodes.Stsfld, field)
+                });
+                
+                res.InsertRange(res.Count - 1, new []
+                {
+                    new CodeInstruction(OpCodes.Ldc_I4_0),
+                    new CodeInstruction(OpCodes.Stsfld, field)
+                });
+
+                return res;
+            }
+        }
+        
+        [HarmonyPatch(typeof(PlayerDataFileManagerSO), nameof(PlayerDataFileManagerSO.LoadFromCurrentVersion))]
+        private class PLoadPlayerData
+        {
+            internal static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+            {
+                var res = instructions.ToList();
+                var field = AccessTools.Field(typeof(HarmonyPatches), nameof(IsLoading));
+                
+                res.InsertRange(0, new []
+                {
+                    new CodeInstruction(OpCodes.Ldc_I4_1),
+                    new CodeInstruction(OpCodes.Stsfld, field)
+                });
+                
+                res.InsertRange(res.Count - 1, new []
+                {
+                    new CodeInstruction(OpCodes.Ldc_I4_0),
+                    new CodeInstruction(OpCodes.Stsfld, field)
+                });
+
+                return res;
             }
         }
     }
