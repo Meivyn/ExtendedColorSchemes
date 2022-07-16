@@ -37,7 +37,7 @@ namespace ExtendedColorSchemes
         [OnExit]
         public void OnApplicationQuit()
         {
-            _harmony.UnpatchSelf();
+            
         }
     }
 }
