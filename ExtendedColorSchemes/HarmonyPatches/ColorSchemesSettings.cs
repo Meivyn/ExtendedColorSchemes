@@ -1,200 +1,94 @@
-﻿using HarmonyLib;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using HarmonyLib;
+using Polyglot;
 
 namespace ExtendedColorSchemes.HarmonyPatches
 {
-    internal class HarmonyPatches
+    [HarmonyPatch(typeof(ColorSchemesSettings), MethodType.Constructor, typeof(ColorScheme[]))]
+    internal class ColorSchemesSettingsConstructor
     {
-        [HarmonyPatch(typeof(ColorSchemesSettings), MethodType.Constructor, new[] { typeof(ColorScheme[]) })]
-        private class PColorSchemesSettings
+        public static int NumberOfDefaultUserColorSchemes;
+        public static string? DefaultSelectedColorSchemeId;
+        public static ColorScheme[]? DefaultColorSchemes;
+
+        private const int NumberOfColorSchemesToAddByDefault = 8;
+        private static readonly int NumberOfColorSchemesToAdd = Plugin.Config.colorSchemes.Count > 0 ? Plugin.Config.colorSchemes.Count : NumberOfColorSchemesToAddByDefault;
+
+        internal static void Prefix(ref ColorScheme[] colorSchemes)
         {
-            internal static void Postfix(List<ColorScheme> ____colorSchemesList, string ____selectedColorSchemeId)
+            DefaultColorSchemes = colorSchemes;
+            NumberOfDefaultUserColorSchemes = colorSchemes.Count(x => x.isEditable);
+            string translation = Localization.Get("CUSTOM_0_COLOR_SCHEME");
+            var regex = new Regex(@"\d+", RegexOptions.None);
+
+            List<ColorScheme> colorSchemesList = colorSchemes.ToList();
+
+            for (var i = 0; i < NumberOfColorSchemesToAdd; i++)
             {
-                if (Plugin.Config.SelectedColorSchemeId == null)
-                    Plugin.Config.SelectedColorSchemeId = ____selectedColorSchemeId;
-
-                var isOutdated = Plugin.Config.ColorSchemesList.Any(x => x._colorSchemeNameLocalizationKey == "Default");
-
-                if (Plugin.Config.ColorSchemesList.Count == 0 || isOutdated)
-                {
-                    for (int i = 0; i < 16; i++)
-                    {
-                        Utils.ExtendedColorScheme oldColorScheme = null;
-
-                        if (Plugin.Config.ColorSchemesList.Count > i)
-                            oldColorScheme = Plugin.Config.ColorSchemesList[i];
-
-                        var newColorScheme = new Utils.ExtendedColorScheme
-                        {
-                            _colorSchemeId = $"User{i + 4}",
-                            _colorSchemeNameLocalizationKey = $"CUSTOM_{i + 4}_COLOR_SCHEME",
-                            _isEditable = oldColorScheme != null ? oldColorScheme._isEditable : ____colorSchemesList[0].isEditable,
-                            _saberAColor = oldColorScheme != null ? oldColorScheme._saberAColor : ____colorSchemesList[0].saberAColor,
-                            _saberBColor = oldColorScheme != null ? oldColorScheme._saberBColor : ____colorSchemesList[0].saberBColor,
-                            _environmentColor0 = oldColorScheme != null ? oldColorScheme._environmentColor0 : ____colorSchemesList[0].environmentColor0,
-                            _environmentColor1 = oldColorScheme != null ? oldColorScheme._environmentColor1 : ____colorSchemesList[0].environmentColor1,
-                            _supportsEnvironmentColorBoost = oldColorScheme != null ? oldColorScheme._supportsEnvironmentColorBoost : ____colorSchemesList[0].supportsEnvironmentColorBoost,
-                            _environmentColor0Boost = oldColorScheme != null ? oldColorScheme._environmentColor0Boost : ____colorSchemesList[0].environmentColor0Boost,
-                            _environmentColor1Boost = oldColorScheme != null ? oldColorScheme._environmentColor1Boost : ____colorSchemesList[0].environmentColor1Boost,
-                            _obstaclesColor = oldColorScheme != null ? oldColorScheme._obstaclesColor : ____colorSchemesList[0].obstaclesColor,
-                        };
-
-                        if (oldColorScheme != null)
-                            Plugin.Config.ColorSchemesList.Remove(oldColorScheme);
-
-                        Plugin.Config.ColorSchemesList.Insert(i, newColorScheme);
-                    }
-
-                    Plugin.Config.Changed();
-                }
+                ColorSchemeWithEditableName? savedColorScheme = Plugin.Config.colorSchemes.Count > i ? Plugin.Config.colorSchemes[i] : null;
+                colorSchemesList.Insert(i + NumberOfDefaultUserColorSchemes, new ColorScheme(
+                    $"User{i + NumberOfDefaultUserColorSchemes}",
+                    $"_UNLOCALIZED_",
+                    true,
+                    !string.IsNullOrWhiteSpace(savedColorScheme?.colorSchemeName) ? savedColorScheme?.colorSchemeName : regex.Replace(translation, (i + NumberOfDefaultUserColorSchemes).ToString()),
+                    colorSchemes[0].isEditable,
+                    savedColorScheme?.saberAColor ?? colorSchemes[0].saberAColor,
+                    savedColorScheme?.saberBColor ?? colorSchemes[0].saberBColor,
+                    savedColorScheme?.environmentColor0 ?? colorSchemes[0].environmentColor0,
+                    savedColorScheme?.environmentColor1 ?? colorSchemes[0].environmentColor1,
+                    colorSchemes[0].supportsEnvironmentColorBoost,
+                    colorSchemes[0].environmentColor0Boost,
+                    colorSchemes[0].environmentColor1Boost,
+                    savedColorScheme?.obstaclesColor ?? colorSchemes[0].obstaclesColor));
             }
-        }
 
-        [HarmonyPatch(typeof(ColorSchemesSettings), "GetNumberOfColorSchemes")]
-        private class PGetNumberOfColorSchemes
-        {
-            internal static void Postfix(ref int __result)
+            if (Plugin.Config.selectedColorSchemeId != null && colorSchemesList.All(x => x.colorSchemeId != Plugin.Config.selectedColorSchemeId))
             {
-                // Prevents the game from saving our color schemes
-                if (Utils.IsCallByMethod("Save"))
-                    return;
-
-                __result += Plugin.Config.ColorSchemesList.Count;
+                Plugin.Log.Warn($"Selected color scheme doesn't exist in the collection, restoring default value \"{DefaultSelectedColorSchemeId}\".");
+                Plugin.Config.selectedColorSchemeId = DefaultSelectedColorSchemeId;
             }
+
+            colorSchemes = colorSchemesList.ToArray();
         }
+    }
 
-        [HarmonyPatch(typeof(ColorSchemesSettings), "GetColorSchemeForIdx")]
-        private class PGetColorSchemeForIdx
+    //[HarmonyPatch(typeof(ColorSchemesSettings), "selectedColorSchemeId", MethodType.Setter)]
+    internal class ColorSchemesSettingsSelectedColorSchemeIdSetter
+    {
+        //[HarmonyPriority(Priority.HigherThanNormal)]
+        internal static void Prefix(ref string? value)
         {
-            internal static bool Prefix(ref ColorScheme __result, ref int idx)
+            if (LoadFromCurrentVersionPatch.PlayerDataIsCorrupted)
             {
-                // Prevents the game from saving our color schemes,
-                // we should only save the base color schemes
-                if (Utils.IsCallByMethod("Save"))
-                    return true;
-
-                // Makes sure our color schemes are inserted at the fourth position
-                // so it follows the base custom ones
-                if (idx < 4)
-                    return true;
-                else if (idx >= Plugin.Config.ColorSchemesList.Count + 4)
-                {
-                    idx -= Plugin.Config.ColorSchemesList.Count;
-                    return true;
-                }
-
-                __result = Plugin.Config.ColorSchemesList[idx - 4].ToColorScheme();
-
-                return false;
+                Plugin.Log.Error("Player data is corrupted, aborting.");
+                return;
             }
-        }
 
-        [HarmonyPatch(typeof(ColorSchemesSettings), "GetColorSchemeForId")]
-        private class PGetColorSchemeForId
-        {
-            internal static void Postfix(ref ColorScheme __result, string id)
+            string? colorSchemeId = value;
+            if (ColorSchemesSettingsConstructor.DefaultColorSchemes != null && ColorSchemesSettingsConstructor.DefaultColorSchemes.Any(x => x.colorSchemeId == colorSchemeId))
             {
-                var extendedColorScheme = Plugin.Config.ColorSchemesList.FirstOrDefault(x => x._colorSchemeId == id);
-
-                if (extendedColorScheme != null)
-                {
-                    __result = extendedColorScheme.ToColorScheme();
-                }
+                ColorSchemesSettingsConstructor.DefaultSelectedColorSchemeId = value;
             }
-        }
 
-        [HarmonyPatch(typeof(ColorSchemesSettings), "GetSelectedColorScheme")]
-        private class PGetSelectedColorScheme
-        {
-            internal static bool Prefix(ref ColorScheme __result)
+            if (!LoadFromCurrentVersionPatch.IsCalledByLoadFromCurrentVersion)
             {
-                var extendedColorScheme = Plugin.Config.ColorSchemesList.FirstOrDefault(x => x._colorSchemeId == Plugin.Config.SelectedColorSchemeId);
-
-                if (extendedColorScheme != null)
-                {
-                    __result = extendedColorScheme.ToColorScheme();
-                    return false;
-                }
-
-                return true;
+                Plugin.Log.Info("Not called by LoadFromCurrentVersion, aborting.");
+                return;
             }
-        }
 
-        [HarmonyPatch(typeof(ColorSchemesSettings), "GetSelectedColorSchemeIdx")]
-        private class PGetSelectedColorSchemeIdx
-        {
-            internal static void Postfix(ref int __result)
+            Plugin.Log.Info($"DefaultSelectedColorSchemeId={value}");
+
+            if (Plugin.Config.selectedColorSchemeId == null)
             {
-                for (int i = 0; i < Plugin.Config.ColorSchemesList.Count; i++)
-                {
-                    if (Plugin.Config.ColorSchemesList[i]._colorSchemeId == Plugin.Config.SelectedColorSchemeId)
-                    {
-                        __result = i + 4;
-                        return;
-                    }
-                }
-
-                // Returns the base color schemes
-                if (__result >= 4)
-                    __result += Plugin.Config.ColorSchemesList.Count;
+                Plugin.Config.selectedColorSchemeId = value;
+                Plugin.Log.Info($"Plugin.Config.selectedColorSchemeId={value}");
             }
-        }
-
-        [HarmonyPatch(typeof(ColorSchemesSettings), "SetColorSchemeForId")]
-        private class PSetColorSchemeForId
-        {
-            internal static void Prefix(ColorScheme colorScheme)
+            else
             {
-                if (Plugin.Config.ColorSchemesList.Any(x => x._colorSchemeId == colorScheme.colorSchemeId))
-                {
-                    for (int i = 0; i < Plugin.Config.ColorSchemesList.Count; i++)
-                    {
-                        if (Plugin.Config.ColorSchemesList[i]._colorSchemeId == colorScheme.colorSchemeId)
-                        {
-                            Plugin.Config.ColorSchemesList[i] = Utils.ToExtendedColorScheme(colorScheme);
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-
-        [HarmonyPatch(typeof(ColorSchemesSettings), "selectedColorSchemeId", MethodType.Getter)]
-        private class PSelectedColorSchemeIdGet
-        {
-            internal static void Postfix(ref string __result)
-            {
-                // Prevents the game from saving our color schemes selection
-                if (Utils.IsCallByMethod("Save"))
-                    return;
-
-                __result = Plugin.Config.SelectedColorSchemeId;
-            }
-        }
-
-        [HarmonyPatch(typeof(ColorSchemesSettings), "selectedColorSchemeId", MethodType.Setter)]
-        private class PSelectedColorSchemeIdSet
-        {
-            internal static bool Prefix(string value, Dictionary<string, ColorScheme> ____colorSchemesDict)
-            {
-                bool existsInCollection = Plugin.Config.ColorSchemesList.Any(x => x._colorSchemeId == value);
-
-                // Makes sure the color scheme exist, probably a bit overkill,
-                // but at least not messing up the game's save file
-                if (!existsInCollection && !____colorSchemesDict.ContainsKey(value))
-                    return false;
-
-                // Prevents the game from overriding our selected color scheme at launch time
-                if (Utils.IsCallByMethod("LoadFromCurrentVersion"))
-                    return true;
-
-                Plugin.Config.SelectedColorSchemeId = value;
-
-                if (existsInCollection)
-                    return false;
-
-                return true;
+                value = Plugin.Config.selectedColorSchemeId;
+                Plugin.Log.Info($"value={Plugin.Config.selectedColorSchemeId}");
             }
         }
     }

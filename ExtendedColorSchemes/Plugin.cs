@@ -1,43 +1,48 @@
-﻿using ExtendedColorSchemes.Installers;
+﻿using System.Reflection;
+using ExtendedColorSchemes.HarmonyPatches;
 using HarmonyLib;
 using IPA;
+using IPA.Config;
 using IPA.Config.Stores;
-using SiraUtil.Zenject;
-using System.Reflection;
-using Conf = IPA.Config.Config;
+using IPA.Loader;
 using IPALogger = IPA.Logging.Logger;
 
 namespace ExtendedColorSchemes
 {
+
     [Plugin(RuntimeOptions.SingleStartInit)]
     public class Plugin
     {
-        internal static IPALogger Log { get; private set; }
-        internal static Config Config { get; private set; }
-
+        private readonly PluginMetadata _metadata;
         private readonly Harmony _harmony;
-        private const string HarmonyID = "com.meivyn.extendedcolorschemes";
+
+        internal static IPALogger Log { get; private set; } = null!;
+        internal static PluginConfig Config { get; private set; } = null!;
 
         [Init]
-        public Plugin(IPALogger logger, Conf conf, Zenjector zenjector)
+        public Plugin(IPALogger logger, PluginMetadata metadata, Config config)
         {
             Log = logger;
-            Config = conf.Generated<Config>();
-            _harmony = new Harmony(HarmonyID);
-
-            zenjector.OnApp<LocalizerInstaller>();
+            Config = config.Generated<PluginConfig>();
+            _metadata = metadata;
+            _harmony = new Harmony("com.meivyn.ExtendedColorSchemes");
         }
 
         [OnStart]
-        public void OnApplicationStart()
+        public void OnStart()
         {
-            _harmony.PatchAll(Assembly.GetExecutingAssembly());
+            MethodInfo? original = AccessTools.PropertySetter(typeof(ColorSchemesSettings), nameof(ColorSchemesSettings.selectedColorSchemeId));
+            MethodInfo? prefix = AccessTools.Method(typeof(ColorSchemesSettingsSelectedColorSchemeIdSetter), nameof(ColorSchemesSettingsSelectedColorSchemeIdSetter.Prefix));
+
+            // We must first patch the setter, otherwise the subsequent calls in
+            // LoadFromCurrentVersion are not using our patch.
+            _harmony.Patch(original, new HarmonyMethod(prefix));
+            _harmony.PatchAll(_metadata.Assembly);
         }
 
         [OnExit]
-        public void OnApplicationQuit()
+        public void OnExit()
         {
-
         }
     }
 }
