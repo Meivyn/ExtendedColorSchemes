@@ -25,6 +25,9 @@ namespace ExtendedColorSchemes.HarmonyPatches
 
             List<ColorScheme> colorSchemesList = colorSchemes.ToList();
 
+            var first = colorSchemesList.First();
+            var firstWithBoostColors = colorSchemesList.FirstOrDefault(x => x.supportsEnvironmentColorBoost);
+
             for (var i = 0; i < NumberOfColorSchemesToAdd; i++)
             {
                 ColorSchemeWithEditableName? savedColorScheme = Plugin.Config.colorSchemes.Count > i ? Plugin.Config.colorSchemes[i] : null;
@@ -33,15 +36,15 @@ namespace ExtendedColorSchemes.HarmonyPatches
                     $"_UNLOCALIZED_",
                     true,
                     !string.IsNullOrWhiteSpace(savedColorScheme?.colorSchemeName) ? savedColorScheme?.colorSchemeName : regex.Replace(translation, (i + NumberOfDefaultUserColorSchemes).ToString()),
-                    colorSchemes[0].isEditable,
-                    savedColorScheme?.saberAColor ?? colorSchemes[0].saberAColor,
-                    savedColorScheme?.saberBColor ?? colorSchemes[0].saberBColor,
-                    savedColorScheme?.environmentColor0 ?? colorSchemes[0].environmentColor0,
-                    savedColorScheme?.environmentColor1 ?? colorSchemes[0].environmentColor1,
-                    colorSchemes[0].supportsEnvironmentColorBoost,
-                    colorSchemes[0].environmentColor0Boost,
-                    colorSchemes[0].environmentColor1Boost,
-                    savedColorScheme?.obstaclesColor ?? colorSchemes[0].obstaclesColor));
+                    first.isEditable,
+                    savedColorScheme?.saberAColor ?? first.saberAColor,
+                    savedColorScheme?.saberBColor ?? first.saberBColor,
+                    savedColorScheme?.environmentColor0 ?? first.environmentColor0,
+                    savedColorScheme?.environmentColor1 ?? first.environmentColor1,
+                    savedColorScheme?.supportsEnvironmentColorBoost ?? firstWithBoostColors?.supportsEnvironmentColorBoost ?? first.supportsEnvironmentColorBoost,
+                    savedColorScheme?.environmentColor0Boost ?? firstWithBoostColors?.environmentColor0Boost ?? first.environmentColor0Boost,
+                    savedColorScheme?.environmentColor1Boost ?? firstWithBoostColors?.environmentColor1Boost ?? first.environmentColor1Boost,
+                    savedColorScheme?.obstaclesColor ?? first.obstaclesColor));
             }
 
             if (Plugin.Config.selectedColorSchemeId != null && colorSchemesList.All(x => x.colorSchemeId != Plugin.Config.selectedColorSchemeId))

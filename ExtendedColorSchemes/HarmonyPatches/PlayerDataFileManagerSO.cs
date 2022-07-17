@@ -64,9 +64,17 @@ namespace ExtendedColorSchemes.HarmonyPatches
                 if (colorScheme.isEditable)
                 {
                     ColorSchemeWithEditableName? savedColorScheme = Plugin.Config.colorSchemes.FirstOrDefault(x => x.colorSchemeId == colorScheme.colorSchemeId);
-                    ColorSchemeWithEditableName colorSchemeWithEditableName = new(savedColorScheme?.colorSchemeName ?? string.Empty,
-                        colorScheme.colorSchemeId, colorScheme.saberAColor, colorScheme.saberBColor,
-                        colorScheme.environmentColor0, colorScheme.environmentColor1, colorScheme.obstaclesColor);
+                    ColorSchemeWithEditableName colorSchemeWithEditableName = new(
+                        savedColorScheme?.colorSchemeName ?? string.Empty,
+                        colorScheme.colorSchemeId,
+                        colorScheme.saberAColor,
+                        colorScheme.saberBColor,
+                        colorScheme.environmentColor0,
+                        colorScheme.environmentColor1,
+                        colorScheme.obstaclesColor,
+                        colorScheme.supportsEnvironmentColorBoost,
+                        colorScheme.environmentColor0Boost,
+                        colorScheme.environmentColor1Boost);
                     list.Add(colorSchemeWithEditableName);
                 }
             }
