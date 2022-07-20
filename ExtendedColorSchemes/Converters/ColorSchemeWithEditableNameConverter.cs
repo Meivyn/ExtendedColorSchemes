@@ -4,6 +4,7 @@ using IPA.Config.Data;
 using IPA.Config.Stores;
 using IPA.Config.Stores.Converters;
 using UnityEngine;
+using Boolean = IPA.Config.Data.Boolean;
 
 namespace ExtendedColorSchemes.Converters
 {
@@ -27,6 +28,11 @@ namespace ExtendedColorSchemes.Converters
             {
                 throw new ArgumentException("colorSchemeId must be a string!");
             }
+            
+            if (map["supportsEnvironmentColorBoost"] is not Boolean supportsEnvironmentColorBoost)
+            {
+                throw new ArgumentException("supportsEnvironmentColorBoost must be a boolean!");
+            }
 
             return new ColorSchemeWithEditableName(colorSchemeName.Value,
                 colorSchemeId.Value,
@@ -34,7 +40,10 @@ namespace ExtendedColorSchemes.Converters
                 CustomValueTypeConverter<Color>.Deserialize(map["saberBColor"], parent),
                 CustomValueTypeConverter<Color>.Deserialize(map["environmentColor0"], parent),
                 CustomValueTypeConverter<Color>.Deserialize(map["environmentColor1"], parent),
-                CustomValueTypeConverter<Color>.Deserialize(map["obstaclesColor"], parent));
+                CustomValueTypeConverter<Color>.Deserialize(map["obstaclesColor"], parent),
+                supportsEnvironmentColorBoost.Value,
+                CustomValueTypeConverter<Color>.Deserialize(map["environmentColor0Boost"], parent),
+                CustomValueTypeConverter<Color>.Deserialize(map["environmentColor1Boost"], parent));
         }
 
         public override Value? ToValue(ColorSchemeWithEditableName? obj, object parent)
@@ -52,7 +61,10 @@ namespace ExtendedColorSchemes.Converters
                 {"saberBColor", CustomValueTypeConverter<Color>.Serialize(obj.saberBColor)},
                 {"environmentColor0", CustomValueTypeConverter<Color>.Serialize(obj.environmentColor0)},
                 {"environmentColor1", CustomValueTypeConverter<Color>.Serialize(obj.environmentColor1)},
-                {"obstaclesColor", CustomValueTypeConverter<Color>.Serialize(obj.obstaclesColor)}
+                {"obstaclesColor", CustomValueTypeConverter<Color>.Serialize(obj.obstaclesColor)},
+                {"supportsEnvironmentColorBoost", Value.From(obj.supportsEnvironmentColorBoost)},
+                {"environmentColor0Boost", CustomValueTypeConverter<Color>.Serialize(obj.environmentColor0Boost)},
+                {"environmentColor1Boost", CustomValueTypeConverter<Color>.Serialize(obj.environmentColor1Boost)}
             });
         }
     }
