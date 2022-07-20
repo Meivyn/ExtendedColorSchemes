@@ -40,6 +40,14 @@ namespace ExtendedColorSchemes.HarmonyPatches
             try
             {
                 File.Copy(filePath, backupFilePath, true);
+					
+                // Only keep the last 5 days worth of files to stop file spam.
+                var fiveDaysAgo = DateTime.Now.Date.AddDays(-5);
+                var oldFiles = Directory.EnumerateFiles(Application.persistentDataPath, "PlayerData_*", SearchOption.TopDirectoryOnly)
+                    .Where(path => File.GetCreationTime(path) < fiveDaysAgo)
+                    .ToList();
+					
+                oldFiles.ForEach(File.Delete);
             }
             catch (Exception e)
             {
