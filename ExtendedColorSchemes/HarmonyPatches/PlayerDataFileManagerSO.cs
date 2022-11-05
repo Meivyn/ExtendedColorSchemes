@@ -63,7 +63,7 @@ namespace ExtendedColorSchemes.HarmonyPatches
                 {
                     ColorSchemeWithEditableName? savedColorScheme = Plugin.Config.colorSchemes.FirstOrDefault(x => x.colorSchemeId == colorScheme.colorSchemeId);
                     ColorSchemeWithEditableName colorSchemeWithEditableName = new(
-                        savedColorScheme?.colorSchemeName ?? string.Empty,
+                        savedColorScheme?.ColorSchemeName ?? string.Empty,
                         colorScheme.colorSchemeId,
                         colorScheme.saberAColor,
                         colorScheme.saberBColor,

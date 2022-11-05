@@ -55,18 +55,17 @@ namespace ExtendedColorSchemes.Converters
 
             return Value.From(new Dictionary<string, Value?>
             {
-                {"colorSchemeName", Value.From(obj.colorSchemeName)},
+                {"colorSchemeName", Value.From(obj.ColorSchemeName)},
                 {"colorSchemeId", Value.From(obj.colorSchemeId)},
                 {"saberAColor", CustomValueTypeConverter<Color>.Serialize(obj.saberAColor)},
                 {"saberBColor", CustomValueTypeConverter<Color>.Serialize(obj.saberBColor)},
                 {"environmentColor0", CustomValueTypeConverter<Color>.Serialize(obj.environmentColor0)},
                 {"environmentColor1", CustomValueTypeConverter<Color>.Serialize(obj.environmentColor1)},
                 {"obstaclesColor", CustomValueTypeConverter<Color>.Serialize(obj.obstaclesColor)},
-                {"supportsEnvironmentColorBoost", Value.From(obj.supportsEnvironmentColorBoost)},
+                {"supportsEnvironmentColorBoost", Value.From(obj.SupportsEnvironmentColorBoost)},
                 {"environmentColor0Boost", CustomValueTypeConverter<Color>.Serialize(obj.environmentColor0Boost)},
                 {"environmentColor1Boost", CustomValueTypeConverter<Color>.Serialize(obj.environmentColor1Boost)}
             });
         }
     }
-
 }
